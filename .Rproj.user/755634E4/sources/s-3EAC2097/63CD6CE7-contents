@@ -70,7 +70,7 @@ nr.employed: number of employees - quarterly indicator (numeric)
 # Question 1
 
 ## Question 1a
-Check for linear correlations between the input variables (numeric). We should also make a correction for `pdays`.
+Check for linear correlations between the input variables (numeric). We should also make a correction for `pdays` since many values are inputted as `999` and this may impact our colinearity assessment.
 
 ```{r 1a}
 # remove non-numeric columns
