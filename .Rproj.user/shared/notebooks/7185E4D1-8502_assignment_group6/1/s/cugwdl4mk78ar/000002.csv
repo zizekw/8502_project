@@ -1,0 +1,4 @@
+"0","bank_additional_full <- read_delim(""data/bank-additional-full.csv"", "
+"0","    "";"", escape_double = FALSE, trim_ws = TRUE)"
+"0",""
+"0","data <- bank_additional_full"
