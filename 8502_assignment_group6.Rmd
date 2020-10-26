@@ -84,10 +84,18 @@ Yes, there are a few variables positively correlated with each other and a selec
 
 ## Question 1b
 
+`Jax input`
 
 ## Question 1c
 
 ```{r 1c}
+# Extract each group
+group1 = subset(data, select = c("age","job","marital","education","default","housing","loan"))
+group2 = subset(data, select = c("contact","month","day_of_week","duration"))
+group3 = subset(data, select = c("campaign","pdays","previous","poutcome"))
+group4 = subset(data, select = c("emp.var.rate","cons.price.idx","cons.conf.idx","euribor3m","nr.employed"))
+outcome = subset(data, select = c("y"))
+
 data_categorical_only <- select_if(data, is.character)
 
 # Test independence by using Chi-square test)
