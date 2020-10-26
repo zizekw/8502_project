@@ -12,14 +12,14 @@
     "properties": {
         "expression": "data_categorical_only",
         "caption": "data_categorical_only",
-        "totalObservations": 41188,
-        "displayedObservations": 41188,
-        "variables": 11,
-        "cacheKey": "487C5E94",
+        "totalObservations": "41188",
+        "displayedObservations": "41188",
+        "variables": "0",
+        "cacheKey": "8C3603D3",
         "object": "data_categorical_only",
         "environment": "",
-        "contentUrl": "grid_resource/gridviewer.html?env=&obj=data_categorical_only&cache_key=487C5E94&max_cols=50",
-        "preview": 0
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=data_categorical_only&cache_key=8C3603D3&max_cols=50",
+        "preview": "0"
     },
     "folds": "",
     "lastKnownWriteTime": 13792668999352432,
