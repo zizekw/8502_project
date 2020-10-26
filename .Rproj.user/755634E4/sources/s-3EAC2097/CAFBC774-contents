@@ -1,0 +1,56 @@
+---
+title: "RSM8502 Group Assignment"
+author: "Group 6"
+date: "26/10/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Prepare data
+```{r}
+# Import data
+bank_full_data = read.csv("/Users/yuan/Documents/Rotman_MMA/RSM8502_ManagDecision/GroupAssignment/bank-additional-full.csv",
+                          head = TRUE, sep = ";")
+print(is.data.frame(bank_full_data))
+
+# Check header and data type
+sapply(bank_full_data, class)
+
+# Extract each group
+group1 = subset(bank_full_data, select = c("age","job","marital","education","default","housing","loan"))
+group2 = subset(bank_full_data, select = c("contact","month","day_of_week","duration"))
+group3 = subset(bank_full_data, select = c("campaign","pdays","previous","poutcome"))
+group4 = subset(bank_full_data, select = c("emp.var.rate","cons.price.idx","cons.conf.idx","euribor3m","nr.employed"))
+outcome = subset(bank_full_data, select = c("y"))
+```
+
+## Question 1a
+```{r}
+library(dplyr)
+numeric_only = select_if(bank_full_data, is.numeric)
+```
+```{r}
+# Correlation test
+library(corrplot)
+cor = cor(numeric_only)
+corrplot(cor, method = "circle")
+```
+
+## Question 1c
+```{r}
+# Extract categorical data only
+categorical_only = select_if(bank_full_data, is.factor)
+# Test independence by using Chi-square test)
+for(col in names(categorical_only)){
+  if (col != "y"){
+    test_data = subset(bank_full_data, select = c(col, "y"))
+    print(table(test_data))
+    print(chisq.test(table(test_data)))
+  }
+}
+```
+
+

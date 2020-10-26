@@ -81,3 +81,26 @@ M <- cor(data_numeric_only)
 corrplot(M, method = "number", tl.col = "black", type = "upper")
 ```
 Yes, there are a few variables positively correlated with each other and a select few negatively correlated. Of note, `emp.var.rate` is positively correlated with `cons.price.idx`, `euribor3m`, and `nr.employed` >0.78 for each.
+
+## Question 1b
+
+## Question 1c
+
+```{r 1c}
+# pearson chi square
+
+# data_categorical_only <- data %>% select_if(is.character)
+
+categorical_only = select_if(data, is.factor)
+# Test independence by using Chi-square test)
+for(col in names(categorical_only)){
+  if (col != "y"){
+    test_data = subset(bank_full_data, select = c(col, "y"))
+    print(table(test_data))
+    print(chisq.test(table(test_data)))
+  }
+}
+```
+
+
+## Question 1d
