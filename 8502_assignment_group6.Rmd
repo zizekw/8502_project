@@ -102,3 +102,45 @@ for(col in names(data_categorical_only)){
 
 
 ## Question 1d
+
+## Question 2a
+```{r}
+# first consider categorical variables
+# we choose factors based on p-value
+# job, marital, education, default, contact, month, day_of_week, poutcome
+
+#install.packages('fastDummies')
+library(fastDummies)
+glm_data = dummy_cols(data, select_columns = c('job', 'marital', 
+                                              'education', 'default', 'contact', 
+                                              'month', 'day_of_week', 'poutcome'),remove_selected_columns = TRUE)
+#ifelse(glm_data=="yes", 1, 0)
+glm_data$y = factor(glm_data$y, levels = c("yes", "no"))
+#glm_data = subset(glm_data, select = -c('emp.var.rate'))
+glm_data = glm_data[,-c(8:12)]
+
+# create test data
+# random select 24713 rows as training data, the rest rows are testing data
+smp_size = floor(0.5 * nrow(glm_data))
+
+set.seed(123)
+train_ind =  sample(seq_len(nrow(glm_data)), size = smp_size)
+
+train = glm_data[train_ind, ]
+test = glm_data[-train_ind, ]
+
+fit = glm(formula = y~ ., 
+          data = train, family=binomial())
+summary(fit)
+
+```
+```{r}
+log_predict = predict(fit, test, type = "response")
+log_predict = ifelse(log_predict > 0.5,1,0)
+library(ROCR)
+library(Metrics)
+pr = prediction(log_predict,test$y)
+perf = performance(pr,measure = "tpr",x.measure = "fpr")
+plot(perf)
+```
+
