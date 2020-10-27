@@ -127,70 +127,141 @@ count(data$pdays)
 data$pdays[data$pdays == 999] = NA
 ```
 ```{r}
-
+# calculate R squre helper function
+R2<- function(model){
+    R2<- 1-(model$deviance/model$null.deviance)
+    return(R2)
+}
 ```
-
-
 
 ```{r}
 # prepare data for glm()
 
+# change responde variable 'y' from yes/no to 1/0
+data$y = revalue(data$y, c("yes"=1))
+data$y = revalue(data$y, c("no"=0))
+data$y = as.numeric(data$y) 
+
+#sapply(glm_data, class)
+
 # create dummy variables for categorical variables
 glm_data = dummy_cols(data, select_columns = c('job', 'marital', 
                                               'education', 'default', 'contact', 
-                                              'month', 'day_of_week', 'poutcome'),remove_selected_columns = TRUE)
-
-# change responde variable 'y' from yes/no to 1/0
-glm_data$y = revalue(glm_data$y, c("yes"=1))
-glm_data$y = revalue(glm_data$y, c("no"=0))
-glm_data$y = as.numeric(glm_data$y) 
+                                              'month', 'day_of_week', 'poutcome',
+                                              'housing', 'loan'),remove_selected_columns = TRUE)
 
 # remove dependent vairables that we dont want to include
-#sapply(glm_data, class)
 # remove Group 4 variables
 glm_data = subset(glm_data, select = -c(emp.var.rate, cons.price.idx, cons.conf.idx,euribor3m, nr.employed ))
-#glm_data = glm_data[,-c(8:12)]
 # remove "duration"
 glm_data = subset(glm_data, select = -c(duration))
-#glm_data = glm_data[,-c(4)]
-
-# split into test and training dataset
-smp_size = floor(0.75 * nrow(glm_data))
-set.seed(123)
-train_ind =  sample(seq_len(nrow(glm_data)), size = smp_size)
-train = glm_data[train_ind, ]
-test = glm_data[-train_ind, ]
 ```
 
 Do regrssion use all numeric and categorical variables
 ```{r}
+glm_data1 = glm_data
+
+# split into test and training dataset
+smp_size = floor(0.75 * nrow(glm_data1))
+set.seed(123)
+train_ind =  sample(seq_len(nrow(glm_data1)), size = smp_size)
+train = glm_data1[train_ind, ]
+test = glm_data1[-train_ind, ]
+
 # fit logistic regression model
 glm_fit1 = glm(formula = y~ ., 
           data = train, family=binomial)
 summary(glm_fit1)
+R2(glm_fit1)
 ```
 
 From the result, we can see 'pdays' is insiginificent, we can remove this factor based on backward elimination.
 ```{r}
+glm_data2 = glm_data
+
 # remove pdays
-glm_data = subset(glm_data, select = -c(pdays))
+glm_data2 = subset(glm_data2, select = -c(pdays))
 
 # split into test and training dataset
-smp_size = floor(0.75 * nrow(glm_data))
+smp_size = floor(0.75 * nrow(glm_data2))
 set.seed(123)
-train_ind =  sample(seq_len(nrow(glm_data)), size = smp_size)
-train = glm_data[train_ind, ]
-test = glm_data[-train_ind, ]
+train_ind =  sample(seq_len(nrow(glm_data2)), size = smp_size)
+train = glm_data2[train_ind, ]
+test = glm_data2[-train_ind, ]
+
 # fit logistic regression model
 glm_fit2 = glm(formula = y~ ., 
           data = train, family=binomial)
 summary(glm_fit2)
+R2(glm_fit2)
 ```
 
+housing has the largest p-value, exclude related to housing
+```{r}
+# pday removed
+glm_data3 = glm_data2
+
+# split into test and training dataset
+smp_size = floor(0.75 * nrow(glm_data3))
+set.seed(123)
+train_ind =  sample(seq_len(nrow(glm_data3)), size = smp_size)
+train = glm_data3[train_ind, ]
+test = glm_data3[-train_ind, ]
+
+# fit logistic regression model
+# exlude housing
+glm_fit3 = glm(formula = y~. -housing_no - housing_yes - housing_unknown, 
+          data = train, family=binomial)
+summary(glm_fit3)
+R2(glm_fit3)
+```
+
+loan p-value get bigger.
+```{r}
+# pday removed
+glm_data4 = glm_data2
+
+# split into test and training dataset
+smp_size = floor(0.75 * nrow(glm_data4))
+set.seed(123)
+train_ind =  sample(seq_len(nrow(glm_data4)), size = smp_size)
+train = glm_data4[train_ind, ]
+test = glm_data4[-train_ind, ]
+
+# fit logistic regression model
+# exlude loan
+glm_fit4 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
+               -loan_no - loan_yes - loan_unknown, 
+          data = train, family=binomial)
+summary(glm_fit4)
+R2(glm_fit4)
+```
+
+default standing out.
+```{r}
+# pday removed
+glm_data5 = glm_data2
+
+# split into test and training dataset
+smp_size = floor(0.75 * nrow(glm_data5))
+set.seed(123)
+train_ind =  sample(seq_len(nrow(glm_data5)), size = smp_size)
+train = glm_data5[train_ind, ]
+test = glm_data5[-train_ind, ]
+
+# fit logistic regression model
+# exlude housing, loan, default
+glm_fit5 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
+               -loan_no - loan_yes - loan_unknown
+               -default_no - default_yes - default_unknown, 
+          data = train, family=binomial)
+summary(glm_fit5)
+R2(glm_fit5)
+```
 
 ```{r}
 # make prediction on test data, threshold = 0.5
-glm_predict = predict(glm_fit, newdata = test, type = "response")
+glm_predict = predict(glm_fit2, newdata = test, type = "response")
 glm_predict = ifelse(glm_predict > 0.5,1,0)
 # create confustion matrix/classification table
 confusionMatrix(data = as.factor(glm_predict) , 
