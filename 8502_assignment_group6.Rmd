@@ -163,6 +163,7 @@ glm_data = subset(glm_data, select = -c(emp.var.rate, cons.price.idx, cons.conf.
 glm_data = subset(glm_data, select = -c(duration))
 ```
 
+## Fit 1
 Do regrssion use all numeric and categorical variables
 ```{r}
 glm_data1 = glm_data
@@ -181,6 +182,7 @@ summary(glm_fit1)
 R2(glm_fit1)
 ```
 
+## Fit 2
 From the result, we can see 'pdays' is insiginificent, we can remove this factor based on backward elimination.
 ```{r}
 glm_data2 = glm_data
@@ -218,7 +220,8 @@ plot(glm_perf)
 #step(glm_fit2, direction = "backward")
 ```
 
-housing has the largest p-value, exclude related to housing
+## Fit 3
+housing has the largest p-value, exclude housing
 ```{r}
 # pday removed
 glm_data3 = glm_data2
@@ -250,6 +253,7 @@ glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 ```
 
+## Fit 4
 loan p-value get bigger.
 ```{r}
 # pday removed
@@ -283,6 +287,7 @@ glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 ```
 
+## Fit 5
 default standing out.
 ```{r}
 # pday removed
@@ -317,6 +322,7 @@ glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 ```
 
+## Fit 6
 taking out marital
 ```{r}
 # pday removed
@@ -352,6 +358,7 @@ glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 ```
 
+## Fit 7
 kind of reach to the limit of main effect, include campaign*previous interaction term
 ```{r}
 # pday removed
@@ -388,6 +395,7 @@ glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 ```
 
+## Fit 8
 ```{r}
 glm_fit8 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
                -loan_no - loan_yes - loan_unknown
@@ -411,7 +419,7 @@ glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 ```
 
-
+## Fit 9
 ```{r}
 glm_fit9 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
                -loan_no - loan_yes - loan_unknown
