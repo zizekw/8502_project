@@ -16,6 +16,7 @@ library(Metrics)
 library(caret)
 library(fastDummies)
 library(plyr)
+library(blorr)
 
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -94,14 +95,41 @@ Yes, there are a few variables positively correlated with each other and a selec
 `Jax input`
 
 ## Question 1c
+```{r}
+# handle '999' placeholder for pdays
+# explor pdays column
+count(data$pdays)
+# change '999' to NA
+data$pdays[data$pdays == 999] = NA
+
+# change responde variable 'y' from yes/no to 1/0
+data$y = revalue(data$y, c("yes"=1))
+data$y = revalue(data$y, c("no"=0))
+data$y = as.numeric(data$y) 
+```
 
 ```{r 1c}
 # Extract each group
-group1 = subset(data, select = c("age","job","marital","education","default","housing","loan"))
-group2 = subset(data, select = c("contact","month","day_of_week","duration"))
-group3 = subset(data, select = c("campaign","pdays","previous","poutcome"))
+group1 = subset(data, select = c("age","job","marital","education","default","housing","loan", "y"))
+group2 = subset(data, select = c("contact","month","day_of_week","duration", "y"))
+group3 = subset(data, select = c("campaign","pdays","previous","poutcome", "y"))
 group4 = subset(data, select = c("emp.var.rate","cons.price.idx","cons.conf.idx","euribor3m","nr.employed"))
 outcome = subset(data, select = c("y"))
+
+glm_fit_group1 = glm(formula = y~ ., 
+          data = group1, family=binomial)
+summary(glm_fit_group1)
+blr_rsq_cox_snell(glm_fit_group1)
+
+glm_fit_group2 = glm(formula = y~ ., 
+          data = group2, family=binomial)
+summary(glm_fit_group2)
+blr_rsq_cox_snell(glm_fit_group2)
+
+glm_fit_group3 = glm(formula = y~ ., 
+          data = group3, family=binomial)
+summary(glm_fit_group3)
+blr_rsq_cox_snell(glm_fit_group3)
 
 data_categorical_only <- select_if(data, is.character)
 
@@ -120,13 +148,6 @@ for(col in names(data_categorical_only)){
 
 ## Question 2a
 ```{r}
-# handle '999' placeholder for pdays
-# explor pdays column
-count(data$pdays)
-# change '999' to NA
-data$pdays[data$pdays == 999] = NA
-```
-```{r}
 # calculate R squre helper function
 R2<- function(model){
     R2<- 1-(model$deviance/model$null.deviance)
@@ -135,21 +156,6 @@ R2<- function(model){
 ```
 
 ```{r}
-# prepare data for glm()
-
-# change responde variable 'y' from yes/no to 1/0
-data$y = revalue(data$y, c("yes"=1))
-data$y = revalue(data$y, c("no"=0))
-data$y = as.numeric(data$y) 
-
-#sapply(glm_data, class)
-datatry = data
-datatry = subset(datatry, select = -c(emp.var.rate, cons.price.idx, cons.conf.idx,euribor3m, nr.employed ))
-glm_fit = glm(formula = y~ ., 
-          data = datatry, family=binomial)
-summary(glm_fit)
-R2(glm_fit)
-
 # create dummy variables for categorical variables
 glm_data = dummy_cols(data, select_columns = c('job', 'marital', 
                                               'education', 'default', 'contact', 
@@ -179,7 +185,7 @@ test = glm_data1[-train_ind, ]
 glm_fit1 = glm(formula = y~ ., 
           data = train, family=binomial)
 summary(glm_fit1)
-R2(glm_fit1)
+blr_rsq_cox_snell(glm_fit1)
 ```
 
 ## Fit 2
@@ -201,7 +207,7 @@ test = glm_data2[-train_ind, ]
 glm_fit2 = glm(formula = y~ ., 
           data = train, family=binomial)
 summary(glm_fit2)
-R2(glm_fit2)
+blr_rsq_cox_snell(glm_fit2)
 ```
 ```{r}
 # make prediction on test data, threshold = 0.5
@@ -238,7 +244,7 @@ test = glm_data3[-train_ind, ]
 glm_fit3 = glm(formula = y~. -housing_no - housing_yes - housing_unknown, 
           data = train, family=binomial)
 summary(glm_fit3)
-R2(glm_fit3)
+blr_rsq_cox_snell(glm_fit3)
 ```
 ```{r}
 # make prediction on test data, threshold = 0.5
@@ -272,7 +278,7 @@ glm_fit4 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
                -loan_no - loan_yes - loan_unknown, 
           data = train, family=binomial)
 summary(glm_fit4)
-R2(glm_fit4)
+blr_rsq_cox_snell(glm_fit4)
 ```
 ```{r}
 # make prediction on test data, threshold = 0.5
@@ -307,7 +313,7 @@ glm_fit5 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
                -default_no - default_yes - default_unknown, 
           data = train, family=binomial)
 summary(glm_fit5)
-R2(glm_fit5)
+blr_rsq_cox_snell(glm_fit5)
 ```
 ```{r}
 # make prediction on test data, threshold = 0.5
@@ -343,7 +349,7 @@ glm_fit6 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
                -marital_divorced - marital_married - marital_single - marital_unknown,
           data = train, family=binomial)
 summary(glm_fit6)
-R2(glm_fit6)
+blr_rsq_cox_snell(glm_fit6)
 ```
 ```{r}
 # make prediction on test data, threshold = 0.5
@@ -380,7 +386,7 @@ glm_fit7 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
                + campaign*previous,
           data = train, family=binomial)
 summary(glm_fit7)
-R2(glm_fit7)
+blr_rsq_cox_snell(glm_fit7)
 ```
 ```{r}
 # make prediction on test data, threshold = 0.5
@@ -404,7 +410,7 @@ glm_fit8 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
                + campaign*poutcome_failure + campaign*poutcome_nonexistent +  campaign*poutcome_success,
           data = train, family=binomial)
 summary(glm_fit8)
-R2(glm_fit8)
+blr_rsq_cox_snell(glm_fit8)
 ```
 ```{r}
 # make prediction on test data, threshold = 0.5
@@ -428,7 +434,7 @@ glm_fit9 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
                + previous*poutcome_failure + previous*poutcome_nonexistent +  previous*poutcome_success,
           data = train, family=binomial)
 summary(glm_fit9)
-R2(glm_fit9)
+blr_rsq_cox_snell(glm_fit9)
 ```
 ```{r}
 # make prediction on test data, threshold = 0.5
