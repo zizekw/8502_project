@@ -129,10 +129,10 @@ glm_data$y = revalue(glm_data$y, c("no"=0))
 glm_data$y = as.numeric(glm_data$y) 
 
 # sapply(glm_data, class)
+# remove Group 4 variables
 glm_data = glm_data[,-c(8:12)]
 
-# create test data
-# random select 24713 rows as training data, the rest rows are testing data
+# split into test and training data
 smp_size = floor(0.75 * nrow(glm_data))
 
 set.seed(123)
@@ -141,6 +141,7 @@ train_ind =  sample(seq_len(nrow(glm_data)), size = smp_size)
 train = glm_data[train_ind, ]
 test = glm_data[-train_ind, ]
 
+# fit logistic regression model
 fit = glm(formula = y~ ., 
           data = train, family=binomial())
 summary(fit)
