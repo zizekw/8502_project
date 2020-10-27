@@ -165,9 +165,9 @@ test = glm_data[-train_ind, ]
 Do regrssion use all numeric and categorical variables
 ```{r}
 # fit logistic regression model
-glm_fit = glm(formula = y~ ., 
+glm_fit1 = glm(formula = y~ ., 
           data = train, family=binomial)
-summary(glm_fit)
+summary(glm_fit1)
 ```
 
 From the result, we can see 'pdays' is insiginificent, we can remove this factor based on backward elimination.
@@ -182,9 +182,9 @@ train_ind =  sample(seq_len(nrow(glm_data)), size = smp_size)
 train = glm_data[train_ind, ]
 test = glm_data[-train_ind, ]
 # fit logistic regression model
-glm_fit = glm(formula = y~ ., 
+glm_fit2 = glm(formula = y~ ., 
           data = train, family=binomial)
-summary(glm_fit)
+summary(glm_fit2)
 ```
 
 
