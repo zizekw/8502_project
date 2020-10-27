@@ -143,6 +143,12 @@ data$y = revalue(data$y, c("no"=0))
 data$y = as.numeric(data$y) 
 
 #sapply(glm_data, class)
+datatry = data
+datatry = subset(datatry, select = -c(emp.var.rate, cons.price.idx, cons.conf.idx,euribor3m, nr.employed ))
+glm_fit = glm(formula = y~ ., 
+          data = datatry, family=binomial)
+summary(glm_fit)
+R2(glm_fit)
 
 # create dummy variables for categorical variables
 glm_data = dummy_cols(data, select_columns = c('job', 'marital', 
@@ -195,6 +201,22 @@ glm_fit2 = glm(formula = y~ .,
 summary(glm_fit2)
 R2(glm_fit2)
 ```
+```{r}
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit2, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+```
+
+```{r}
+#step(glm_fit2, direction = "backward")
+```
 
 housing has the largest p-value, exclude related to housing
 ```{r}
@@ -214,6 +236,18 @@ glm_fit3 = glm(formula = y~. -housing_no - housing_yes - housing_unknown,
           data = train, family=binomial)
 summary(glm_fit3)
 R2(glm_fit3)
+```
+```{r}
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit3, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
 ```
 
 loan p-value get bigger.
@@ -236,6 +270,18 @@ glm_fit4 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
 summary(glm_fit4)
 R2(glm_fit4)
 ```
+```{r}
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit4, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+```
 
 default standing out.
 ```{r}
@@ -257,6 +303,18 @@ glm_fit5 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
           data = train, family=binomial)
 summary(glm_fit5)
 R2(glm_fit5)
+```
+```{r}
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit5, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
 ```
 
 taking out marital
@@ -281,6 +339,18 @@ glm_fit6 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
 summary(glm_fit6)
 R2(glm_fit6)
 ```
+```{r}
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit6, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+```
 
 kind of reach to the limit of main effect, include campaign*previous interaction term
 ```{r}
@@ -304,33 +374,10 @@ glm_fit7 = glm(formula = y~. -housing_no - housing_yes - housing_unknown
           data = train, family=binomial)
 summary(glm_fit7)
 R2(glm_fit7)
-
-glm_fit8 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
-               -loan_no - loan_yes - loan_unknown
-               -default_no - default_yes - default_unknown
-               -marital_divorced - marital_married - marital_single - marital_unknown
-               + campaign*poutcome_failure + campaign*poutcome_nonexistent +  campaign*poutcome_success,
-          data = train, family=binomial)
-summary(glm_fit8)
-R2(glm_fit8)
-
-glm_fit9 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
-               -loan_no - loan_yes - loan_unknown
-               -default_no - default_yes - default_unknown
-               -marital_divorced - marital_married - marital_single - marital_unknown
-               + previous*poutcome_failure + previous*poutcome_nonexistent +  previous*poutcome_success,
-          data = train, family=binomial)
-summary(glm_fit9)
-R2(glm_fit9)
-
 ```
-
-among all the interation terms selections, the first one is useful.
 ```{r}
-model_list = list(glm_fit2, glm_fit3,glm_fit4, glm_fit5, glm_fit6, glm_fit7, glm_fit8, glm_fit9)
-
 # make prediction on test data, threshold = 0.5
-glm_predict = predict(glm_fit2, newdata = test, type = "response")
+glm_predict = predict(glm_fit7, newdata = test, type = "response")
 glm_predict = ifelse(glm_predict > 0.5,1,0)
 # create confustion matrix/classification table
 confusionMatrix(data = as.factor(glm_predict) , 
@@ -339,6 +386,53 @@ confusionMatrix(data = as.factor(glm_predict) ,
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
-auc(glm_predict,test$y)
 ```
 
+```{r}
+glm_fit8 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
+               -loan_no - loan_yes - loan_unknown
+               -default_no - default_yes - default_unknown
+               -marital_divorced - marital_married - marital_single - marital_unknown
+               + campaign*poutcome_failure + campaign*poutcome_nonexistent +  campaign*poutcome_success,
+          data = train, family=binomial)
+summary(glm_fit8)
+R2(glm_fit8)
+```
+```{r}
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit8, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+```
+
+
+```{r}
+glm_fit9 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
+               -loan_no - loan_yes - loan_unknown
+               -default_no - default_yes - default_unknown
+               -marital_divorced - marital_married - marital_single - marital_unknown
+               + previous*poutcome_failure + previous*poutcome_nonexistent +  previous*poutcome_success,
+          data = train, family=binomial)
+summary(glm_fit9)
+R2(glm_fit9)
+```
+```{r}
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit9, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+```
+
+among all the interation terms selections, the first one is useful.
