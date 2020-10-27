@@ -259,7 +259,76 @@ summary(glm_fit5)
 R2(glm_fit5)
 ```
 
+taking out marital
 ```{r}
+# pday removed
+glm_data6 = glm_data2
+
+# split into test and training dataset
+smp_size = floor(0.75 * nrow(glm_data6))
+set.seed(123)
+train_ind =  sample(seq_len(nrow(glm_data6)), size = smp_size)
+train = glm_data6[train_ind, ]
+test = glm_data6[-train_ind, ]
+
+# fit logistic regression model
+# exlude housing, loan, default, marital
+glm_fit6 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
+               -loan_no - loan_yes - loan_unknown
+               -default_no - default_yes - default_unknown
+               -marital_divorced - marital_married - marital_single - marital_unknown,
+          data = train, family=binomial)
+summary(glm_fit6)
+R2(glm_fit6)
+```
+
+kind of reach to the limit of main effect, include campaign*previous interaction term
+```{r}
+# pday removed
+glm_data7 = glm_data2
+
+# split into test and training dataset
+smp_size = floor(0.75 * nrow(glm_data7))
+set.seed(123)
+train_ind =  sample(seq_len(nrow(glm_data7)), size = smp_size)
+train = glm_data7[train_ind, ]
+test = glm_data7[-train_ind, ]
+
+# fit logistic regression model
+# exlude housing, loan, default, marital
+glm_fit7 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
+               -loan_no - loan_yes - loan_unknown
+               -default_no - default_yes - default_unknown
+               -marital_divorced - marital_married - marital_single - marital_unknown
+               + campaign*previous,
+          data = train, family=binomial)
+summary(glm_fit7)
+R2(glm_fit7)
+
+glm_fit8 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
+               -loan_no - loan_yes - loan_unknown
+               -default_no - default_yes - default_unknown
+               -marital_divorced - marital_married - marital_single - marital_unknown
+               + campaign*poutcome_failure + campaign*poutcome_nonexistent +  campaign*poutcome_success,
+          data = train, family=binomial)
+summary(glm_fit8)
+R2(glm_fit8)
+
+glm_fit9 = glm(formula = y~. -housing_no - housing_yes - housing_unknown 
+               -loan_no - loan_yes - loan_unknown
+               -default_no - default_yes - default_unknown
+               -marital_divorced - marital_married - marital_single - marital_unknown
+               + previous*poutcome_failure + previous*poutcome_nonexistent +  previous*poutcome_success,
+          data = train, family=binomial)
+summary(glm_fit9)
+R2(glm_fit9)
+
+```
+
+among all the interation terms selections, the first one is useful.
+```{r}
+model_list = list(glm_fit2, glm_fit3,glm_fit4, glm_fit5, glm_fit6, glm_fit7, glm_fit8, glm_fit9)
+
 # make prediction on test data, threshold = 0.5
 glm_predict = predict(glm_fit2, newdata = test, type = "response")
 glm_predict = ifelse(glm_predict > 0.5,1,0)
