@@ -120,22 +120,39 @@ for(col in names(data_categorical_only)){
 
 ## Question 2a
 ```{r}
-# first consider categorical variables
-# we choose factors based on p-value
-# job, marital, education, default, contact, month, day_of_week, poutcome
+# handle '999' placeholder for pdays
+# explor pdays column
+count(data$pdays)
+# change '999' to NA
+data$pdays[data$pdays == 999] = NA
+```
+```{r}
 
-#install.packages('fastDummies')
+```
+
+
+
+```{r}
+# prepare data for glm()
+
+# create dummy variables for categorical variables
 glm_data = dummy_cols(data, select_columns = c('job', 'marital', 
                                               'education', 'default', 'contact', 
                                               'month', 'day_of_week', 'poutcome'),remove_selected_columns = TRUE)
 
+# change responde variable 'y' from yes/no to 1/0
 glm_data$y = revalue(glm_data$y, c("yes"=1))
 glm_data$y = revalue(glm_data$y, c("no"=0))
 glm_data$y = as.numeric(glm_data$y) 
 
-# sapply(glm_data, class)
+# remove dependent vairables that we dont want to include
+#sapply(glm_data, class)
 # remove Group 4 variables
-glm_data = glm_data[,-c(8:12)]
+glm_data = subset(glm_data, select = -c(emp.var.rate, cons.price.idx, cons.conf.idx,euribor3m, nr.employed ))
+#glm_data = glm_data[,-c(8:12)]
+# remove "duration"
+glm_data = subset(glm_data, select = -c(duration))
+#glm_data = glm_data[,-c(4)]
 
 # split into test and training dataset
 smp_size = floor(0.75 * nrow(glm_data))
@@ -143,7 +160,27 @@ set.seed(123)
 train_ind =  sample(seq_len(nrow(glm_data)), size = smp_size)
 train = glm_data[train_ind, ]
 test = glm_data[-train_ind, ]
+```
 
+Do regrssion use all numeric and categorical variables
+```{r}
+# fit logistic regression model
+glm_fit = glm(formula = y~ ., 
+          data = train, family=binomial)
+summary(glm_fit)
+```
+
+From the result, we can see 'pdays' is insiginificent, we can remove this factor based on backward elimination.
+```{r}
+# remove pdays
+glm_data = subset(glm_data, select = -c(pdays))
+
+# split into test and training dataset
+smp_size = floor(0.75 * nrow(glm_data))
+set.seed(123)
+train_ind =  sample(seq_len(nrow(glm_data)), size = smp_size)
+train = glm_data[train_ind, ]
+test = glm_data[-train_ind, ]
 # fit logistic regression model
 glm_fit = glm(formula = y~ ., 
           data = train, family=binomial)
