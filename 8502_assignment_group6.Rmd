@@ -2,13 +2,20 @@
 title: "DT Bank Campaign Analysis (RSM8502 Project)"
 author: "Group 6"
 date: "28/10/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 library(readr)
 library(corrplot)
 library(tidyverse)
+library(ROCR)
+library(Metrics)
+library(caret)
+library(fastDummies)
+library(plyr)
 
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -118,12 +125,10 @@ for(col in names(data_categorical_only)){
 # job, marital, education, default, contact, month, day_of_week, poutcome
 
 #install.packages('fastDummies')
-library(fastDummies)
 glm_data = dummy_cols(data, select_columns = c('job', 'marital', 
                                               'education', 'default', 'contact', 
                                               'month', 'day_of_week', 'poutcome'),remove_selected_columns = TRUE)
 
-library(plyr)
 glm_data$y = revalue(glm_data$y, c("yes"=1))
 glm_data$y = revalue(glm_data$y, c("no"=0))
 glm_data$y = as.numeric(glm_data$y) 
@@ -132,31 +137,31 @@ glm_data$y = as.numeric(glm_data$y)
 # remove Group 4 variables
 glm_data = glm_data[,-c(8:12)]
 
-# split into test and training data
+# split into test and training dataset
 smp_size = floor(0.75 * nrow(glm_data))
-
 set.seed(123)
 train_ind =  sample(seq_len(nrow(glm_data)), size = smp_size)
-
 train = glm_data[train_ind, ]
 test = glm_data[-train_ind, ]
 
 # fit logistic regression model
-fit = glm(formula = y~ ., 
-          data = train, family=binomial())
-summary(fit)
-
+glm_fit = glm(formula = y~ ., 
+          data = train, family=binomial)
+summary(glm_fit)
 ```
 
 
 ```{r}
-log_predict = predict(fit, test, type = "response")
-log_predict = ifelse(log_predict > 0.5,1,0)
-library(ROCR)
-library(Metrics)
-pr = prediction(log_predict,test$y)
-perf = performance(pr, measure = "tpr",x.measure = "fpr")
-plot(perf)
-auc(test$y,log_predict)
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+auc(glm_predict,test$y)
 ```
 
