@@ -154,6 +154,20 @@ R2<- function(model){
     R2<- 1-(model$deviance/model$null.deviance)
     return(R2)
 }
+
+# calcualte precision
+model_precision<- function(cm_table){
+  cm_table[1,1]/sum(cm_table[1:2,1])
+}
+
+model_recall<- function(cm_table){
+  cm_table[1,1]/sum(cm_table[1,1:2])
+}
+
+f_score<- function(precision, recall){
+  2 * precision * recall /(precision + recall)
+}
+
 ```
 
 ```{r}
@@ -211,21 +225,59 @@ summary(glm_fit2)
 blr_rsq_cox_snell(glm_fit2)
 ```
 ```{r}
-# make prediction on test data, threshold = 0.5
+# make prediction on test data, threshold = 0.3
 glm_predict = predict(glm_fit2, newdata = test, type = "response")
-glm_predict = ifelse(glm_predict > 0.5,1,0)
+glm_predict = ifelse(glm_predict > 0.3,1,0)
 # create confustion matrix/classification table
-confusionMatrix(data = as.factor(glm_predict) , 
+cm = confusionMatrix(data = as.factor(glm_predict) , 
                 reference = as.factor(test$y))
 # generate ROC curve
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
-# Calcualte presion hardcoded at this point, improve later
-model_presion = 9059/(9059+126)
-model_recall = 9059/(9059+908)
-model_presion
-model_recall
+# 
+cm$table
+p = model_precision(cm$table)
+r = model_recall(cm$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit2, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+cm = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+# 
+cm$table
+p = model_precision(cm$table)
+r = model_recall(cm$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.7
+glm_predict = predict(glm_fit2, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.7,1,0)
+# create confustion matrix/classification table
+cm = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+# 
+cm$table
+p = model_precision(cm$table)
+r = model_recall(cm$table)
+p
+r
+f_score(p, r)
 ```
 
 ```{r}
@@ -255,19 +307,57 @@ blr_rsq_cox_snell(glm_fit3)
 ```{r}
 # make prediction on test data, threshold = 0.5
 glm_predict = predict(glm_fit3, newdata = test, type = "response")
-glm_predict = ifelse(glm_predict > 0.5,1,0)
+glm_predict = ifelse(glm_predict > 0.3,1,0)
 # create confustion matrix/classification table
-confusionMatrix(data = as.factor(glm_predict) , 
+cm3 = confusionMatrix(data = as.factor(glm_predict) , 
                 reference = as.factor(test$y))
 # generate ROC curve
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 
-model_presion = 9059/(9059+126)
-model_recall = 9050/(9050+908)
-model_presion
-model_recall
+cm3$table
+p = model_precision(cm3$table)
+r = model_recall(cm3$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit3, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+cm3 = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm3$table
+p = model_precision(cm3$table)
+r = model_recall(cm3$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit3, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.7,1,0)
+# create confustion matrix/classification table
+cm = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm3$table
+p = model_precision(cm3$table)
+r = model_recall(cm3$table)
+p
+r
+f_score(p, r)
 ```
 
 ## Fit 4
@@ -294,19 +384,57 @@ blr_rsq_cox_snell(glm_fit4)
 ```{r}
 # make prediction on test data, threshold = 0.5
 glm_predict = predict(glm_fit4, newdata = test, type = "response")
-glm_predict = ifelse(glm_predict > 0.5,1,0)
+glm_predict = ifelse(glm_predict > 0.3,1,0)
 # create confustion matrix/classification table
-confusionMatrix(data = as.factor(glm_predict) , 
+cm4 = confusionMatrix(data = as.factor(glm_predict) , 
                 reference = as.factor(test$y))
 # generate ROC curve
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 
-model_presion = 9059/(9059+123)
-model_recall = 9050/(9050+907)
-model_presion
-model_recall
+cm4$table
+p = model_precision(cm4$table)
+r = model_recall(cm4$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit4, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+cm4 = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm4$table
+p = model_precision(cm4$table)
+r = model_recall(cm4$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit4, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.7,1,0)
+# create confustion matrix/classification table
+cm4 = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm4$table
+p = model_precision(cm4$table)
+r = model_recall(cm4$table)
+p
+r
+f_score(p, r)
 ```
 
 ## Fit 5
@@ -334,19 +462,57 @@ blr_rsq_cox_snell(glm_fit5)
 ```{r}
 # make prediction on test data, threshold = 0.5
 glm_predict = predict(glm_fit5, newdata = test, type = "response")
-glm_predict = ifelse(glm_predict > 0.5,1,0)
+glm_predict = ifelse(glm_predict > 0.3,1,0)
 # create confustion matrix/classification table
-confusionMatrix(data = as.factor(glm_predict) , 
+cm5 = confusionMatrix(data = as.factor(glm_predict) , 
                 reference = as.factor(test$y))
 # generate ROC curve
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 
-model_presion = 9064/(9064+121)
-model_recall = 9064/(9064+913)
-model_presion
-model_recall
+cm5$table
+p = model_precision(cm5$table)
+r = model_recall(cm5$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit5, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+cm5 = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm5$table
+p = model_precision(cm5$table)
+r = model_recall(cm5$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit5, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.7,1,0)
+# create confustion matrix/classification table
+cm5 = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm5$table
+p = model_precision(cm5$table)
+r = model_recall(cm5$table)
+p
+r
+f_score(p, r)
 ```
 
 ## Fit 6
@@ -375,19 +541,57 @@ blr_rsq_cox_snell(glm_fit6)
 ```{r}
 # make prediction on test data, threshold = 0.5
 glm_predict = predict(glm_fit6, newdata = test, type = "response")
-glm_predict = ifelse(glm_predict > 0.5,1,0)
+glm_predict = ifelse(glm_predict > 0.3,1,0)
 # create confustion matrix/classification table
-confusionMatrix(data = as.factor(glm_predict) , 
+cm6 = confusionMatrix(data = as.factor(glm_predict) , 
                 reference = as.factor(test$y))
 # generate ROC curve
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 
-model_presion = 9068/(9068+117)
-model_recall = 9068/(9068+917)
-model_presion
-model_recall
+cm6$table
+p = model_precision(cm6$table)
+r = model_recall(cm6$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit6, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+cm6 = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm6$table
+p = model_precision(cm6$table)
+r = model_recall(cm6$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit6, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.7,1,0)
+# create confustion matrix/classification table
+cm6 = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm6$table
+p = model_precision(cm6$table)
+r = model_recall(cm6$table)
+p
+r
+f_score(p, r)
 ```
 
 ## Fit 7
@@ -415,19 +619,57 @@ blr_rsq_cox_snell(glm_fit7)
 ```{r}
 # make prediction on test data, threshold = 0.5
 glm_predict = predict(glm_fit7, newdata = test, type = "response")
-glm_predict = ifelse(glm_predict > 0.5,1,0)
+glm_predict = ifelse(glm_predict > 0.3,1,0)
 # create confustion matrix/classification table
-confusionMatrix(data = as.factor(glm_predict) , 
+cm7 = confusionMatrix(data = as.factor(glm_predict) , 
                 reference = as.factor(test$y))
 # generate ROC curve
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
 
-model_Precision = 9060 / (9060 + 125)
-model_recall = 9060/(9060+906)
-model_Precision
-model_recall
+cm7$table
+p = model_precision(cm7$table)
+r = model_recall(cm7$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit7, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.5,1,0)
+# create confustion matrix/classification table
+cm7 = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm7$table
+p = model_precision(cm7$table)
+r = model_recall(cm7$table)
+p
+r
+f_score(p, r)
+
+# make prediction on test data, threshold = 0.5
+glm_predict = predict(glm_fit7, newdata = test, type = "response")
+glm_predict = ifelse(glm_predict > 0.7,1,0)
+# create confustion matrix/classification table
+cm7 = confusionMatrix(data = as.factor(glm_predict) , 
+                reference = as.factor(test$y))
+# generate ROC curve
+glm_preobj = prediction(predictions = glm_predict, labels = test$y)
+glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
+plot(glm_perf)
+
+cm7$table
+p = model_precision(cm7$table)
+r = model_recall(cm7$table)
+p
+r
+f_score(p, r)
 ```
 
 ## Fit 8
