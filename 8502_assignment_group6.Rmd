@@ -221,6 +221,11 @@ confusionMatrix(data = as.factor(glm_predict) ,
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
+# Calcualte presion hardcoded at this point, improve later
+model_presion = 9059/(9059+126)
+model_recall = 9059/(9059+908)
+model_presion
+model_recall
 ```
 
 ```{r}
@@ -258,6 +263,11 @@ confusionMatrix(data = as.factor(glm_predict) ,
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
+
+model_presion = 9059/(9059+126)
+model_recall = 9050/(9050+908)
+model_presion
+model_recall
 ```
 
 ## Fit 4
@@ -292,6 +302,11 @@ confusionMatrix(data = as.factor(glm_predict) ,
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
+
+model_presion = 9059/(9059+123)
+model_recall = 9050/(9050+907)
+model_presion
+model_recall
 ```
 
 ## Fit 5
@@ -327,6 +342,11 @@ confusionMatrix(data = as.factor(glm_predict) ,
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
+
+model_presion = 9064/(9064+121)
+model_recall = 9064/(9064+913)
+model_presion
+model_recall
 ```
 
 ## Fit 6
@@ -363,6 +383,11 @@ confusionMatrix(data = as.factor(glm_predict) ,
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
+
+model_presion = 9068/(9068+117)
+model_recall = 9068/(9068+917)
+model_presion
+model_recall
 ```
 
 ## Fit 7
@@ -398,7 +423,11 @@ confusionMatrix(data = as.factor(glm_predict) ,
 glm_preobj = prediction(predictions = glm_predict, labels = test$y)
 glm_perf = performance(glm_preobj, measure = "tpr",x.measure = "fpr")
 plot(glm_perf)
-Precision = TruePositives / (TruePositives + FalsePositives)
+
+model_Precision = 9060 / (9060 + 125)
+model_recall = 9060/(9060+906)
+model_Precision
+model_recall
 ```
 
 ## Fit 8
